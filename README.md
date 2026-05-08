@@ -1,8 +1,10 @@
 # baconfy/prompt
 
-[![Latest Version](https://img.shields.io/packagist/v/baconfy/prompt.svg?style=flat-square)](https://packagist.org/packages/baconfy/prompt)
-[![Tests](https://img.shields.io/github/actions/workflow/status/baconfy/prompt/tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/baconfy/prompt/actions)
-[![License](https://img.shields.io/packagist/l/baconfy/prompt.svg?style=flat-square)](LICENSE)
+[![Tests](https://github.com/baconfy/prompt/actions/workflows/tests.yml/badge.svg)](https://github.com/baconfy/prompt/actions/workflows/tests.yml)
+[![Latest Version](https://img.shields.io/packagist/v/baconfy/prompt.svg)](https://packagist.org/packages/baconfy/prompt)
+[![License](https://img.shields.io/packagist/l/baconfy/prompt.svg)](https://packagist.org/packages/baconfy/prompt)
+[![Total Downloads](https://img.shields.io/packagist/dt/baconfy/prompt.svg)](https://packagist.org/packages/baconfy/prompt)
+[![PHP Version](https://img.shields.io/packagist/php-v/baconfy/prompt.svg)](https://packagist.org/packages/baconfy/prompt)
 
 Manage AI prompts in Laravel as Markdown files (with optional YAML front matter) or database records, rendered through Blade.
 
