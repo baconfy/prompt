@@ -49,14 +49,14 @@
     }
   },
   "scripts": {
-    "test": "pest",
-    "test:coverage": "pest --coverage --min=100",
+    "test": "pest --parallel --compact",
+    "test:coverage": "pest --coverage --min=100 --parallel --compact",
     "test:types": "phpstan analyse",
     "format": "pint",
     "test:all": [
+      "@test",
       "@test:coverage",
-      "@test:types",
-      "@test"
+      "@test:types"
     ]
   },
   "extra": {

@@ -10,33 +10,39 @@ use Illuminate\Database\Connection;
 
 final readonly class DatabaseDriver implements Driver
 {
-    public function __construct(private Connection $connection, private string $table) {}
+    public function __construct(
+        private Connection $connection,
+        private string $table,
+    ) {}
 
     public function find(string $name): ?ParsedFrontMatter
     {
-        $row = $this->connection->table($this->table)->where('name', $name)->first();
+        /** @var object{content: string, metadata: ?string}|null $row */
+        $row = $this->connection->table($this->table)
+            ->where('name', $name)
+            ->first();
 
         if ($row === null) {
             return null;
         }
 
         return new ParsedFrontMatter(
-            metadata: $this->decodeMetadata($row->metadata ?? null),
-            content: (string) $row->content,
+            metadata: $this->decodeMetadata($row->metadata),
+            content: $row->content,
         );
     }
 
     /**
      * @return array<string, mixed>  Decoded metadata, or empty array when null.
      */
-    private function decodeMetadata(mixed $raw): array
+    private function decodeMetadata(?string $raw): array
     {
         if ($raw === null) {
             return [];
         }
 
         /** @var array<string, mixed> $decoded */
-        $decoded = json_decode((string) $raw, true) ?? [];
+        $decoded = json_decode($raw, true) ?? [];
 
         return $decoded;
     }
