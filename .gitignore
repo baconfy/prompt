@@ -3,6 +3,7 @@
 
 # IDE files
 /.idea/
+/.DS_Store
 
 # Composer lock (uncomment for libraries/packages)
 composer.lock
