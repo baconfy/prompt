@@ -5,23 +5,18 @@ declare(strict_types=1);
 namespace Baconfy\Prompt;
 
 use Baconfy\Prompt\Contracts\Driver;
+use Baconfy\Prompt\Drivers\DatabaseDriver;
 use Baconfy\Prompt\Drivers\FileDriver;
+use Baconfy\Prompt\Exceptions\PromptNotFoundException;
 use Baconfy\Prompt\FrontMatter\ParsedFrontMatter;
 use Baconfy\Prompt\FrontMatter\Parser;
-use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Database\DatabaseManager;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Manager;
 use InvalidArgumentException;
 
 final class PromptManager extends Manager
 {
-    /**
-     * Retrieves the name of the default prompt driver.
-     *
-     * @return string The configured default prompt driver name.
-     *
-     * @throws InvalidArgumentException If the default driver value is not a string.
-     */
     public function getDefaultDriver(): string
     {
         $default = $this->config->get('prompt.default');
@@ -33,12 +28,6 @@ final class PromptManager extends Manager
         return $default;
     }
 
-    /**
-     * Retrieves the parsed front matter associated with the given source name.
-     *
-     * @param  string  $name  The name of the source to retrieve.
-     * @return ParsedFrontMatter|null The parsed front matter if found, or null if not found.
-     */
     public function source(string $name): ?ParsedFrontMatter
     {
         /** @var Driver $driver */
@@ -48,13 +37,22 @@ final class PromptManager extends Manager
     }
 
     /**
-     * Creates and returns a driver instance based on the provided driver type.
+     * @param  array<string, mixed>  $data  Variables provided to render the prompt.
      *
-     * @param  string  $driver  The name of the driver to be created.
-     * @return Driver The created driver instance.
-     *
-     * @throws InvalidArgumentException If the driver is not configured or the driver type is unsupported.
-     * @throws BindingResolutionException
+     * @throws PromptNotFoundException
+     */
+    public function get(string $name, array $data = []): RenderedPrompt
+    {
+        $source = $this->source($name) ?? throw new PromptNotFoundException($name);
+
+        /** @var Renderer $renderer */
+        $renderer = $this->container->make(Renderer::class);
+
+        return $renderer->render($source, $data);
+    }
+
+    /**
+     * @param  string  $driver  Connection name from prompt.drivers.X.
      */
     protected function createDriver($driver): Driver
     {
@@ -72,18 +70,13 @@ final class PromptManager extends Manager
 
         return match ($type) {
             'file' => $this->createFileDriverFromConfig($config),
+            'database' => $this->createDatabaseDriverFromConfig($config),
             default => throw new InvalidArgumentException("Prompt driver type [{$type}] is not supported."),
         };
     }
 
     /**
-     * Creates and configures a new instance of FileDriver using the provided configuration.
-     *
-     * @param  array<mixed>  $config  An associative array containing the configuration options. Must include a "folder" key with a string value.
-     * @return FileDriver  The created FileDriver instance based on the given configuration.
-     *
-     * @throws InvalidArgumentException  If the "folder" configuration is missing or is not a string.
-     * @throws BindingResolutionException
+     * @param  array<mixed>  $config  Driver configuration block from prompt.drivers.X.
      */
     private function createFileDriverFromConfig(array $config): FileDriver
     {
@@ -97,6 +90,29 @@ final class PromptManager extends Manager
             files: $this->container->make(Filesystem::class),
             parser: $this->container->make(Parser::class),
             folder: $folder,
+        );
+    }
+
+    /**
+     * @param  array<mixed>  $config  Driver configuration block from prompt.drivers.X.
+     */
+    private function createDatabaseDriverFromConfig(array $config): DatabaseDriver
+    {
+        $table = $config['table'] ?? null;
+
+        if (! is_string($table)) {
+            throw new InvalidArgumentException('Database driver requires a "table" configuration string.');
+        }
+
+        /** @var string|null $connection */
+        $connection = $config['connection'] ?? null;
+
+        /** @var DatabaseManager $db */
+        $db = $this->container->make('db');
+
+        return new DatabaseDriver(
+            connection: $db->connection($connection),
+            table: $table,
         );
     }
 }

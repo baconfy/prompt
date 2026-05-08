@@ -2,8 +2,11 @@
 
 declare(strict_types=1);
 
+use Baconfy\Prompt\Drivers\DatabaseDriver;
 use Baconfy\Prompt\Drivers\FileDriver;
+use Baconfy\Prompt\Exceptions\PromptNotFoundException;
 use Baconfy\Prompt\Facades\Prompt;
+use Baconfy\Prompt\RenderedPrompt;
 
 beforeEach(function (): void {
     config()->set('prompt.default', 'file');
@@ -24,6 +27,15 @@ it('resolves a named driver from config', function (): void {
     ]);
 
     expect(Prompt::driver('system'))->toBeInstanceOf(FileDriver::class);
+});
+
+it('resolves the database driver from config', function (): void {
+    config()->set('prompt.drivers.db', [
+        'driver' => 'database',
+        'table' => 'prompts',
+    ]);
+
+    expect(Prompt::driver('db'))->toBeInstanceOf(DatabaseDriver::class);
 });
 
 it('returns a parsed prompt source via the default driver', function (): void {
@@ -70,3 +82,32 @@ it('throws when the file driver config is missing the folder field', function ()
 
     Prompt::driver('broken');
 })->throws(InvalidArgumentException::class, 'File driver requires a "folder" configuration string.');
+
+it('throws when the database driver config is missing the table field', function (): void {
+    config()->set('prompt.drivers.broken', [
+        'driver' => 'database',
+    ]);
+
+    Prompt::driver('broken');
+})->throws(InvalidArgumentException::class, 'Database driver requires a "table" configuration string.');
+
+it('gets a rendered prompt via Prompt::get()', function (): void {
+    $rendered = Prompt::get('welcome', ['name' => 'João']);
+
+    expect($rendered)->toBeInstanceOf(RenderedPrompt::class)
+        ->and($rendered->content)->toBe('Hello João!'."\n")
+        ->and($rendered->metadata)->toBe(['model' => 'claude-opus-4-5']);
+});
+
+it('throws PromptNotFoundException when the prompt does not exist', function (): void {
+    Prompt::get('does-not-exist');
+})->throws(PromptNotFoundException::class, 'Prompt [does-not-exist] not found.');
+
+it('exposes the prompt name on the not-found exception', function (): void {
+    try {
+        Prompt::get('missing');
+        expect(true)->toBeFalse();
+    } catch (PromptNotFoundException $e) {
+        expect($e->name)->toBe('missing');
+    }
+});

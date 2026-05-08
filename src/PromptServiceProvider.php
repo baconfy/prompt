@@ -11,7 +11,10 @@ final class PromptServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__.'/../config/prompt.php', 'prompt');
+        $this->mergeConfigFrom(
+            __DIR__.'/../config/prompt.php',
+            'prompt',
+        );
 
         $this->app->singleton('prompt', fn (Application $app) => new PromptManager($app));
         $this->app->alias('prompt', PromptManager::class);
@@ -20,7 +23,13 @@ final class PromptServiceProvider extends ServiceProvider
     public function boot(): void
     {
         if ($this->app->runningInConsole()) {
-            $this->publishes([__DIR__.'/../config/prompt.php' => config_path('prompt.php')], 'prompt-config');
+            $this->publishes([
+                __DIR__.'/../config/prompt.php' => config_path('prompt.php'),
+            ], 'prompt-config');
+
+            $this->publishesMigrations([
+                __DIR__.'/../database/migrations' => database_path('migrations'),
+            ], 'prompt-migrations');
         }
     }
 }
