@@ -45,6 +45,7 @@
   },
   "autoload-dev": {
     "psr-4": {
+      "Baconfy\\Prompt\\Database\\Factories\\": "database/factories",
       "Baconfy\\Prompt\\Tests\\": "tests/"
     }
   },
