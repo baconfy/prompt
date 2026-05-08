@@ -41,15 +41,7 @@ final readonly class FileDriver implements Driver
         return $this->parser->parse($this->files->get($path));
     }
 
-    /**
-     * Retrieves a sorted list of file names from the specified folder where files have an 'md' extension.
-     *
-     * The method checks if the folder exists and iterates over all files in the folder. It filters out
-     * files that do not have the 'md' extension and converts valid file paths into a dot-separated format.
-     * The resulting file names are sorted alphabetically before being returned.
-     *
-     * @return array An array of sorted file names with dot-separated paths for files with an 'md' extension. Returns an empty array if the folder does not exist.
-     */
+    /** @return list<string> */
     public function all(): array
     {
         if (! $this->files->isDirectory($this->folder)) {

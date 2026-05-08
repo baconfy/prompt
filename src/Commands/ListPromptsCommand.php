@@ -4,18 +4,11 @@ declare(strict_types=1);
 
 namespace Baconfy\Prompt\Commands;
 
-use Baconfy\Prompt\Contracts\Driver;
 use Baconfy\Prompt\PromptManager;
 use Illuminate\Console\Command;
 
 final class ListPromptsCommand extends Command
 {
-    /**
-     * The signature for the command 'prompt:list' which accepts an optional parameter.
-     *
-     * @var string $driver Optional parameter indicating the name of the driver.
-     *                     Defaults to all configured drivers if not provided.
-     */
     protected $signature = 'prompt:list {driver? : Driver name (defaults to all configured drivers)}';
 
     /**
@@ -41,11 +34,13 @@ final class ListPromptsCommand extends Command
             return self::SUCCESS;
         }
 
-        /** @var array<string, mixed> $drivers */
         $drivers = config('prompt.drivers', []);
+        if (! is_array($drivers)) {
+            return self::SUCCESS;
+        }
 
         foreach (array_keys($drivers) as $name) {
-            $this->listDriverPrompts($manager, $name);
+            $this->listDriverPrompts($manager, (string) $name);
         }
 
         return self::SUCCESS;
@@ -61,9 +56,7 @@ final class ListPromptsCommand extends Command
      */
     private function listDriverPrompts(PromptManager $manager, string $driverName): void
     {
-        /** @var Driver $driver */
-        $driver = $manager->driver($driverName);
-        $prompts = $driver->all();
+        $prompts = $manager->driver($driverName)->all();
 
         $this->components->twoColumnDetail($driverName, count($prompts).' prompts');
 

@@ -32,12 +32,7 @@ final class Prompt extends Facade
     }
 
     /**
-     * Fakes the prompt system by replacing it with a mock implementation.
-     *
-     * @param  array<string, mixed>  $stubs  An array of stubs to define the mocked behavior of the prompt system.
-     * @return PromptFake The mock implementation of the prompt system.
-     *
-     * @see \Baconfy\Prompt\PromptManager
+     * @param  array<string, RenderedPrompt|string>  $stubs  Optional prompt stubs.
      */
     public static function fake(array $stubs = []): PromptFake
     {

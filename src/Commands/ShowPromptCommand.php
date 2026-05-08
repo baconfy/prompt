@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Baconfy\Prompt\Commands;
 
-use Baconfy\Prompt\Contracts\Driver;
 use Baconfy\Prompt\PromptManager;
 use Illuminate\Console\Command;
 
@@ -35,15 +34,12 @@ final class ShowPromptCommand extends Command
     {
         $rawName = $this->argument('name');
         if (! is_string($rawName)) {
-            return self::FAILURE;
+            return self::FAILURE; // @codeCoverageIgnore
         }
 
         $driverOption = $this->option('driver');
 
-        /** @var Driver $driver */
-        $driver = $manager->driver(is_string($driverOption) ? $driverOption : null);
-
-        $parsed = $driver->find($rawName);
+        $parsed = $manager->driver(is_string($driverOption) ? $driverOption : null)->find($rawName);
 
         if ($parsed === null) {
             $this->components->error("Prompt [{$rawName}] not found.");

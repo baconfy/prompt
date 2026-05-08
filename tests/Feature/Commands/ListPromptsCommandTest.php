@@ -25,3 +25,10 @@ it('lists prompts from a specified driver via argument', function (): void {
         ->expectsOutputToContain('auth.login')
         ->assertExitCode(0);
 });
+
+it('returns success immediately when drivers config is not an array', function (): void {
+    config()->set('prompt.drivers', 'not-an-array');
+
+    $this->artisan('prompt:list')
+        ->assertExitCode(0);
+});

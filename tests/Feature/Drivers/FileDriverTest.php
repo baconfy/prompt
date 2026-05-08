@@ -33,3 +33,23 @@ it('returns null when the prompt does not exist', function (): void {
 it('lists all prompt names from the folder', function (): void {
     expect($this->driver->all())->toBe(['auth.login', 'welcome']);
 });
+
+it('returns an empty array when the folder does not exist', function (): void {
+    $driver = new FileDriver(new Filesystem, new Parser, '/non/existent/path');
+
+    expect($driver->all())->toBe([]);
+});
+
+it('skips non-markdown files when listing prompts', function (): void {
+    $tmpFolder = sys_get_temp_dir().'/prompt-driver-test-'.uniqid();
+    mkdir($tmpFolder, 0755, true);
+    file_put_contents($tmpFolder.'/keep.md', 'content');
+    file_put_contents($tmpFolder.'/ignore.txt', 'ignored');
+
+    $driver = new FileDriver(new Filesystem, new Parser, $tmpFolder);
+    $names = $driver->all();
+
+    (new Filesystem)->deleteDirectory($tmpFolder);
+
+    expect($names)->toBe(['keep']);
+});

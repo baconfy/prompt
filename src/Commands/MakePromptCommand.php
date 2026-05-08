@@ -46,7 +46,7 @@ final class MakePromptCommand extends Command
 
         $rawName = $this->argument('name');
         if (! is_string($rawName)) {
-            return self::FAILURE;
+            return self::FAILURE; // @codeCoverageIgnore
         }
 
         $relative = str_replace('.', DIRECTORY_SEPARATOR, $rawName);
