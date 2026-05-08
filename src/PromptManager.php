@@ -59,6 +59,7 @@ final class PromptManager extends Manager
      *
      * @throws BindingResolutionException
      */
+    /** @param array<string, mixed> $data */
     public function get(string $name, array $data = []): RenderedPrompt
     {
         $source = $this->source($name) ?? throw new PromptNotFoundException($name);
@@ -79,6 +80,10 @@ final class PromptManager extends Manager
      */
     protected function createDriver($driver): Driver
     {
+        if (! is_string($driver)) {
+            throw new InvalidArgumentException('Driver name must be a string.');
+        }
+
         $config = $this->config->get("prompt.drivers.{$driver}");
 
         if (! is_array($config)) {
@@ -107,6 +112,7 @@ final class PromptManager extends Manager
      * @throws InvalidArgumentException If the 'folder' configuration is missing or not a string.
      * @throws BindingResolutionException
      */
+    /** @param array<string, mixed> $config */
     private function createFileDriverFromConfig(array $config): FileDriver
     {
         $folder = $config['folder'] ?? null;
@@ -135,6 +141,7 @@ final class PromptManager extends Manager
      * @throws InvalidArgumentException If the 'table' configuration is missing or not a string.
      * @throws BindingResolutionException
      */
+    /** @param array<string, mixed> $config */
     private function createDatabaseDriverFromConfig(array $config): DatabaseDriver
     {
         $table = $config['table'] ?? null;

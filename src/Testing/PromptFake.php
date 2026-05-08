@@ -15,21 +15,13 @@ final class PromptFake
     private array $calls = [];
 
     /**
-     * Constructor method.
-     *
-     * @param  array<int|string, mixed>  $stubs  An associative array of stubs to initialize the instance.
-     *
-     * @return void
+     * @param  array<string, RenderedPrompt|string>  $stubs  Map of prompt name to stub content or instance.
      */
     public function __construct(private readonly array $stubs = []) {}
 
     /**
-     * Retrieves a rendered prompt by its name and optional associated data.
-     *
-     * @param  string  $name  The name of the prompt to retrieve.
-     * @param  array  $data  Optional associative array of data to be used by the prompt.
-     * @return RenderedPrompt The rendered prompt instance associated with the given name.
-     * @throws PromptNotFoundException If the prompt with the specified name does not exist.
+     * @param  array<string, mixed>  $data
+     * @throws PromptNotFoundException
      */
     public function get(string $name, array $data = []): RenderedPrompt
     {
