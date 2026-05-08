@@ -7,7 +7,6 @@
 
 # Composer lock (uncomment for libraries/packages)
 composer.lock
-CLAUDE.md
 
 # PHP artifacts
 
