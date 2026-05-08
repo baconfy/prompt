@@ -29,3 +29,7 @@ it('resolves dot notation to nested folders', function (): void {
 it('returns null when the prompt does not exist', function (): void {
     expect($this->driver->find('does-not-exist'))->toBeNull();
 });
+
+it('lists all prompt names from the folder', function (): void {
+    expect($this->driver->all())->toBe(['auth.login', 'welcome']);
+});

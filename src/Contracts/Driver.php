@@ -18,4 +18,9 @@ interface Driver
      * Returns null when the prompt is not found.
      */
     public function find(string $name): ?ParsedFrontMatter;
+
+    /**
+     * @return list<string>  Available prompt names, sorted alphabetically.
+     */
+    public function all(): array;
 }

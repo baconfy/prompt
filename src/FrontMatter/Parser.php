@@ -8,6 +8,12 @@ use Symfony\Component\Yaml\Yaml;
 
 final class Parser
 {
+    /**
+     * Regular expression pattern used to extract YAML front matter and content
+     * from a given string. The `yaml` named group captures the YAML front matter
+     * section, and the `content` named group captures the remaining content
+     * after the front matter.
+     */
     private const string PATTERN = '/\A---\R(?<yaml>(?:.*?\R)?)---(?:\R(?<content>.*))?\z/s';
 
     /**

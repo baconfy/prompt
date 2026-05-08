@@ -9,12 +9,14 @@ use Illuminate\Support\ServiceProvider;
 
 final class PromptServiceProvider extends ServiceProvider
 {
+    /**
+     * Registers the service provider by merging the configuration file and binding the PromptManager to the service container.
+     *
+     * @return void
+     */
     public function register(): void
     {
-        $this->mergeConfigFrom(
-            __DIR__.'/../config/prompt.php',
-            'prompt',
-        );
+        $this->mergeConfigFrom(__DIR__.'/../config/prompt.php', 'prompt');
 
         $this->app->singleton('prompt', fn (Application $app) => new PromptManager($app));
         $this->app->alias('prompt', PromptManager::class);
@@ -23,13 +25,15 @@ final class PromptServiceProvider extends ServiceProvider
     public function boot(): void
     {
         if ($this->app->runningInConsole()) {
-            $this->publishes([
-                __DIR__.'/../config/prompt.php' => config_path('prompt.php'),
-            ], 'prompt-config');
+            $this->publishes([__DIR__.'/../config/prompt.php' => config_path('prompt.php')], 'prompt-config');
 
-            $this->publishesMigrations([
-                __DIR__.'/../database/migrations' => database_path('migrations'),
-            ], 'prompt-migrations');
+            $this->publishesMigrations([__DIR__.'/../database/migrations' => database_path('migrations')], 'prompt-migrations');
+
+            $this->commands([
+                Commands\ListPromptsCommand::class,
+                Commands\MakePromptCommand::class,
+                Commands\ShowPromptCommand::class,
+            ]);
         }
     }
 }

@@ -10,6 +10,7 @@ use Baconfy\Prompt\Drivers\FileDriver;
 use Baconfy\Prompt\Exceptions\PromptNotFoundException;
 use Baconfy\Prompt\FrontMatter\ParsedFrontMatter;
 use Baconfy\Prompt\FrontMatter\Parser;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Manager;
@@ -17,6 +18,13 @@ use InvalidArgumentException;
 
 final class PromptManager extends Manager
 {
+    /**
+     * Retrieves the default prompt driver name from the configuration.
+     *
+     * @return string The name of the default prompt driver.
+     *
+     * @throws InvalidArgumentException If the default driver is not configured as a string.
+     */
     public function getDefaultDriver(): string
     {
         $default = $this->config->get('prompt.default');
@@ -28,6 +36,12 @@ final class PromptManager extends Manager
         return $default;
     }
 
+    /**
+     * Retrieves the parsed front matter for the given source name.
+     *
+     * @param  string  $name  The name of the source to lookup.
+     * @return ParsedFrontMatter|null The parsed front matter if found, or null otherwise.
+     */
     public function source(string $name): ?ParsedFrontMatter
     {
         /** @var Driver $driver */
@@ -37,9 +51,13 @@ final class PromptManager extends Manager
     }
 
     /**
-     * @param  array<string, mixed>  $data  Variables provided to render the prompt.
+     * Retrieves and renders a prompt based on the given name and data.
      *
-     * @throws PromptNotFoundException
+     * @param  string  $name  The name of the prompt to retrieve.
+     * @param  array  $data  The contextual data to be used during rendering.
+     * @return RenderedPrompt The rendered prompt object.
+     *
+     * @throws BindingResolutionException
      */
     public function get(string $name, array $data = []): RenderedPrompt
     {
@@ -52,7 +70,12 @@ final class PromptManager extends Manager
     }
 
     /**
-     * @param  string  $driver  Connection name from prompt.drivers.X.
+     * Creates a driver instance based on the specified driver configuration.
+     *
+     * @param  mixed  $driver  The identifier for the driver to be created.
+     * @return Driver  The created driver instance.
+     *
+     * @throws InvalidArgumentException If the driver is not configured properly or the driver type is unsupported.
      */
     protected function createDriver($driver): Driver
     {
@@ -76,7 +99,13 @@ final class PromptManager extends Manager
     }
 
     /**
-     * @param  array<mixed>  $config  Driver configuration block from prompt.drivers.X.
+     * Creates an instance of FileDriver based on the provided configuration.
+     *
+     * @param  array  $config  The configuration array containing driver settings.
+     * @return FileDriver The created FileDriver instance.
+     *
+     * @throws InvalidArgumentException If the 'folder' configuration is missing or not a string.
+     * @throws BindingResolutionException
      */
     private function createFileDriverFromConfig(array $config): FileDriver
     {
@@ -94,7 +123,17 @@ final class PromptManager extends Manager
     }
 
     /**
-     * @param  array<mixed>  $config  Driver configuration block from prompt.drivers.X.
+     * Creates a new instance of the DatabaseDriver using the provided configuration.
+     *
+     * @param  array  $config  The configuration array containing settings for the database driver.
+     *                         Required keys:
+     *                         - 'table': A string specifying the name of the database table.
+     *                         Optional keys:
+     *                         - 'connection': A string specifying the database connection name.
+     * @return DatabaseDriver  The constructed DatabaseDriver instance.
+     *
+     * @throws InvalidArgumentException If the 'table' configuration is missing or not a string.
+     * @throws BindingResolutionException
      */
     private function createDatabaseDriverFromConfig(array $config): DatabaseDriver
     {
@@ -112,6 +151,7 @@ final class PromptManager extends Manager
 
         return new DatabaseDriver(
             connection: $db->connection($connection),
+            parser: $this->container->make(Parser::class),
             table: $table,
         );
     }

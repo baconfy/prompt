@@ -16,16 +16,5 @@ class Prompt extends Model
     protected $fillable = [
         'name',
         'content',
-        'metadata',
     ];
-
-    /**
-     * @return array<string, string>  Attribute casting rules.
-     */
-    protected function casts(): array
-    {
-        return [
-            'metadata' => 'array',
-        ];
-    }
 }

@@ -9,7 +9,11 @@ use Stringable;
 final readonly class RenderedPrompt implements Stringable
 {
     /**
-     * @param  array<string, mixed>  $metadata  Front matter metadata carried over from the source prompt.
+     * Initializes a new instance of the class.
+     *
+     * @param  string  $content  The main content to be stored in the instance.
+     * @param  array  $metadata  An optional associative array of metadata related to the content.
+     * @return void
      */
     public function __construct(public string $content, public array $metadata = []) {}
 

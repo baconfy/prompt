@@ -1,6 +1,7 @@
 {
   "name": "baconfy/prompt",
   "description": "Manage AI prompts in Laravel with Markdown + YAML front matter, multiple drivers (file/database), and Blade rendering.",
+  "license": "GPL-3.0-or-later",
   "keywords": [
     "laravel",
     "prompt",
@@ -11,7 +12,6 @@
     "front-matter"
   ],
   "type": "library",
-  "license": "MIT",
   "authors": [
     {
       "name": "Baconfy",

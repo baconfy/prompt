@@ -10,6 +10,7 @@ beforeEach(function (): void {
 
     $this->driver = new DatabaseDriver(
         connection: DB::connection(),
+        parser: new \Baconfy\Prompt\FrontMatter\Parser,
         table: 'prompts',
     );
 });
@@ -17,8 +18,7 @@ beforeEach(function (): void {
 it('finds a prompt stored in the database with metadata', function (): void {
     DB::table('prompts')->insert([
         'name' => 'welcome',
-        'content' => 'Hello {{ $name }}!',
-        'metadata' => json_encode(['model' => 'claude-opus-4-5']),
+        'content' => "---\nmodel: claude-opus-4-5\n---\nHello {{ \$name }}!",
         'created_at' => now(),
         'updated_at' => now(),
     ]);
@@ -33,7 +33,6 @@ it('finds a prompt without metadata', function (): void {
     DB::table('prompts')->insert([
         'name' => 'simple',
         'content' => 'Just static content.',
-        'metadata' => null,
         'created_at' => now(),
         'updated_at' => now(),
     ]);
@@ -46,4 +45,13 @@ it('finds a prompt without metadata', function (): void {
 
 it('returns null when the prompt is not in the database', function (): void {
     expect($this->driver->find('does-not-exist'))->toBeNull();
+});
+
+it('lists all prompt names from the table', function (): void {
+    DB::table('prompts')->insert([
+        ['name' => 'b-second', 'content' => 'B', 'created_at' => now(), 'updated_at' => now()],
+        ['name' => 'a-first', 'content' => 'A', 'created_at' => now(), 'updated_at' => now()],
+    ]);
+
+    expect($this->driver->all())->toBe(['a-first', 'b-second']);
 });
