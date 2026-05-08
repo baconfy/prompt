@@ -1,0 +1,78 @@
+{
+  "name": "baconfy/prompt",
+  "description": "Manage AI prompts in Laravel with Markdown + YAML front matter, multiple drivers (file/database), and Blade rendering.",
+  "version": "1.0.0",
+  "keywords": [
+    "laravel",
+    "prompt",
+    "ai",
+    "llm",
+    "markdown",
+    "blade",
+    "front-matter"
+  ],
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Baconfy",
+      "homepage": "https://github.com/baconfy"
+    }
+  ],
+  "require": {
+    "php": "^8.3",
+    "illuminate/console": "^11.0|^12.0|^13.0",
+    "illuminate/contracts": "^11.0|^12.0|^13.0",
+    "illuminate/database": "^11.0|^12.0|^13.0",
+    "illuminate/filesystem": "^11.0|^12.0|^13.0",
+    "illuminate/support": "^11.0|^12.0|^13.0",
+    "illuminate/view": "^11.0|^12.0|^13.0",
+    "symfony/yaml": "^7.0"
+  },
+  "require-dev": {
+    "larastan/larastan": "^3.0",
+    "laravel/pint": "^1.18",
+    "orchestra/testbench": "^9.0|^10.0",
+    "pestphp/pest": "^3.0",
+    "pestphp/pest-plugin-laravel": "^3.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Baconfy\\Prompt\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Baconfy\\Prompt\\Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "test": "pest --parallel --compact",
+    "test:coverage": "pest --parallel --coverage --min=100",
+    "test:types": "phpstan analyse",
+    "format": "pint",
+    "test:all": [
+      "@test",
+      "@test:coverage",
+      "@test:types"
+    ]
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Baconfy\\Prompt\\PromptServiceProvider"
+      ],
+      "aliases": {
+        "Prompt": "Baconfy\\Prompt\\Facades\\Prompt"
+      }
+    }
+  },
+  "config": {
+    "sort-packages": true,
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
+}

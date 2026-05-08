@@ -1,0 +1,72 @@
+<?php
+
+declare(strict_types=1);
+
+use Baconfy\Prompt\Drivers\FileDriver;
+use Baconfy\Prompt\Facades\Prompt;
+
+beforeEach(function (): void {
+    config()->set('prompt.default', 'file');
+    config()->set('prompt.drivers.file', [
+        'driver' => 'file',
+        'folder' => __DIR__.'/../Fixtures/prompts',
+    ]);
+});
+
+it('resolves the default driver from config', function (): void {
+    expect(Prompt::driver())->toBeInstanceOf(FileDriver::class);
+});
+
+it('resolves a named driver from config', function (): void {
+    config()->set('prompt.drivers.system', [
+        'driver' => 'file',
+        'folder' => __DIR__.'/../Fixtures/prompts',
+    ]);
+
+    expect(Prompt::driver('system'))->toBeInstanceOf(FileDriver::class);
+});
+
+it('returns a parsed prompt source via the default driver', function (): void {
+    $parsed = Prompt::source('welcome');
+
+    expect($parsed?->metadata)->toBe(['model' => 'claude-opus-4-5'])
+        ->and($parsed?->content)->toBe('Hello {{ $name }}!'."\n");
+});
+
+it('returns null when the source does not exist', function (): void {
+    expect(Prompt::source('does-not-exist'))->toBeNull();
+});
+
+it('throws when the default driver is not a string', function (): void {
+    config()->set('prompt.default', null);
+
+    Prompt::driver();
+})->throws(InvalidArgumentException::class, 'Default prompt driver must be configured as a string.');
+
+it('throws when the driver name is not configured', function (): void {
+    Prompt::driver('non-existent-name');
+})->throws(InvalidArgumentException::class, 'Prompt driver [non-existent-name] is not configured.');
+
+it('throws when the driver config is missing the type field', function (): void {
+    config()->set('prompt.drivers.broken', [
+        'folder' => '/tmp',
+    ]);
+
+    Prompt::driver('broken');
+})->throws(InvalidArgumentException::class, "missing a 'driver' type");
+
+it('throws when the driver type is not supported', function (): void {
+    config()->set('prompt.drivers.broken', [
+        'driver' => 'unsupported-type',
+    ]);
+
+    Prompt::driver('broken');
+})->throws(InvalidArgumentException::class, 'Prompt driver type [unsupported-type] is not supported.');
+
+it('throws when the file driver config is missing the folder field', function (): void {
+    config()->set('prompt.drivers.broken', [
+        'driver' => 'file',
+    ]);
+
+    Prompt::driver('broken');
+})->throws(InvalidArgumentException::class, 'File driver requires a "folder" configuration string.');

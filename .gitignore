@@ -1,0 +1,14 @@
+# Composer dependencies
+/vendor/
+
+# IDE files
+/.idea/
+
+# Composer lock (uncomment for libraries/packages)
+composer.lock
+CLAUDE.md
+
+# PHP artifacts
+
+*.log
+*.cache
