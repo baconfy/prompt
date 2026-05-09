@@ -2,9 +2,6 @@
     <img src="https://raw.githubusercontent.com/baconfy/prompt/main/docs/presentation.jpg" alt="Prompt">
 </p>
 
-
-# baconfy/prompt
-
 [![Tests](https://github.com/baconfy/prompt/actions/workflows/tests.yml/badge.svg)](https://github.com/baconfy/prompt/actions/workflows/tests.yml)
 [![Latest Version](https://img.shields.io/packagist/v/baconfy/prompt.svg)](https://packagist.org/packages/baconfy/prompt)
 [![License](https://img.shields.io/packagist/l/baconfy/prompt.svg)](https://packagist.org/packages/baconfy/prompt)
