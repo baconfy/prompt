@@ -1,3 +1,8 @@
+<p align="center">
+    <img src="https://raw.githubusercontent.com/baconfy/prompt/main/docs/presentation.jpg" alt="Prompt">
+</p>
+
+
 # baconfy/prompt
 
 [![Tests](https://github.com/baconfy/prompt/actions/workflows/tests.yml/badge.svg)](https://github.com/baconfy/prompt/actions/workflows/tests.yml)
