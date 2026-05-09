@@ -21,7 +21,7 @@ LLM prompts are configuration. They drift across the codebase, get duplicated, a
 ## Requirements
 
 - PHP 8.3+
-- Laravel 11, 12 or 13
+- Laravel 12+
 
 ## Installation
 
@@ -214,6 +214,58 @@ PromptModel::where('name', 'welcome')->update(['content' => 'Hi {{ $name }}!']);
 
 The driver itself does not depend on this model — it reads via Query Builder. The model is a convenience for your CRUD layer.
 
+## CLI
+
+Three Artisan commands ship with the package:
+
+```bash
+php artisan prompt:list                              # list prompts across all configured drivers
+php artisan prompt:list database                     # list prompts for a specific driver
+php artisan prompt:show welcome                      # show metadata and raw content for a single prompt
+php artisan prompt:show welcome --driver=database    # target a specific driver
+php artisan prompt:make welcome                      # scaffold resources/prompts/welcome.md
+```
+
+`prompt:list` accepts an optional driver argument (the name of any driver defined in `config/prompt.php`); omitting it iterates all drivers. `prompt:show` accepts a `--driver=` option to target a specific named driver instead of the active default. `prompt:make` is file-driver only — database prompts are created directly via the `prompts` table.
+
+`prompt:show` is your debug companion: confirm what `Prompt::source('welcome')` will return before rendering anywhere.
+
+## Testing
+
+### Faking prompts
+
+In your application's tests, replace the real driver with a stub so prompts don't hit the filesystem or database:
+
+```php
+use Baconfy\Prompt\Facades\Prompt;
+use Baconfy\Prompt\RenderedPrompt;
+
+Prompt::fake([
+    'welcome' => 'Hello stub!',
+    'auth.login' => new RenderedPrompt('Stub login.', ['model' => 'gpt-4']),
+]);
+
+// code under test
+prompt('welcome', ['name' => 'whatever']);
+
+Prompt::assertCalled('welcome');
+Prompt::assertNotCalled('checkout');
+```
+
+A plain string stub is wrapped in a `RenderedPrompt` with empty metadata; pass a `RenderedPrompt` instance when your code reads `$prompt->metadata`.
+
+### Factories
+
+The `Prompt` model ships with an Eloquent factory for seeding test data when you use the database driver:
+
+```php
+use Baconfy\Prompt\Models\Prompt;
+
+Prompt::factory()->create();
+Prompt::factory()->count(5)->create();
+Prompt::factory()->create(['name' => 'welcome', 'content' => 'Hi!']);
+```
+
 ## Configuration
 
 `config/prompt.php`:
@@ -252,7 +304,7 @@ use Baconfy\Prompt\Exceptions\MissingRequiredVariablesException;
 
 Blade compiles prompt content. **Do not load prompt content from untrusted sources.** A prompt containing `{{ system('rm -rf /') }}` would execute that PHP if rendered. Treat prompts as code, not user input.
 
-## Testing
+## Development
 
 Run the package test suite:
 
