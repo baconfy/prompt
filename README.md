@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="https://raw.githubusercontent.com/baconfy/prompt/main/docs/presentation.jpg" alt="Prompt">
+    <img src="https://raw.githubusercontent.com/baconfy/prompt/main/docs/presentation.jpg" width="100%" alt="Prompt">
 </p>
 
 [![Tests](https://github.com/baconfy/prompt/actions/workflows/tests.yml/badge.svg)](https://github.com/baconfy/prompt/actions/workflows/tests.yml)
