@@ -24,6 +24,8 @@ final class PromptServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+
         if ($this->app->runningInConsole()) {
             $this->publishes([__DIR__.'/../config/prompt.php' => config_path('prompt.php')], 'prompt-config');
 
