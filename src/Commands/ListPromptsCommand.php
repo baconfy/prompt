@@ -14,7 +14,7 @@ final class ListPromptsCommand extends Command
     /**
      * The description for the command to list all available prompts.
      *
-     * @var string $description Describes the purpose of the command.
+     * @var string Describes the purpose of the command.
      */
     protected $description = 'List all available prompts.';
 
@@ -51,8 +51,6 @@ final class ListPromptsCommand extends Command
      *
      * @param  PromptManager  $manager  An instance of the PromptManager used to retrieve the driver and its prompts.
      * @param  string  $driverName  The name of the driver whose prompts are to be listed.
-     *
-     * @return void
      */
     private function listDriverPrompts(PromptManager $manager, string $driverName): void
     {

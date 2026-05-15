@@ -302,9 +302,75 @@ use Baconfy\Prompt\Exceptions\MissingRequiredVariablesException;
 - `PromptNotFoundException` — thrown by `Prompt::get()` when the name is not found by the active driver. Exposes `->name`.
 - `MissingRequiredVariablesException` — thrown when the prompt declares `required` in its metadata and any variable is missing from `$data`. Exposes `->variables` (the list of missing names).
 
+## Admin Panel
+
+Optional Livewire-based panel for managing prompts stored in the `database` driver. The `file` driver remains read-only and is meant to be managed via Git.
+
+### Install
+
+```bash
+composer require livewire/livewire:^3
+```
+
+The panel auto-discovers when `livewire/livewire` is installed. Routes are mounted at `/_prompts` by default.
+
+### Authorization
+
+Two equivalent options (the callback wins if both are present):
+
+```php
+// AppServiceProvider::boot() — closure style (like Horizon::auth)
+use Baconfy\Prompt\Panel;
+
+Panel::auth(fn ($user = null) => $user?->email === 'you@example.com');
+```
+
+```php
+// or via a regular Gate
+use Illuminate\Support\Facades\Gate;
+
+Gate::define('viewPrompts', fn ($user = null) => $user?->isAdmin());
+```
+
+If neither is defined, the panel responds **403**.
+
+### Features
+
+- **Index** at `/_prompts` — paginated list of every prompt name (latest version per name) with a `vN` badge and live search.
+- **Editor** at `/_prompts/create` and `/_prompts/{prompt}/edit` — form with live preview that renders the prompt through Blade using JSON variables. Refuses to save if the content is identical to the current latest version.
+- **Versions** at `/_prompts/{prompt}/versions` — accordion of every revision with a unified diff against the current version. Each older row can be **Restored** (creates a new version on top with the chosen content) or **Deleted**.
+
+### Versioning model
+
+Every save inserts a new row in the `prompts` table; existing rows are never updated. Rows sharing a `name` form a version chain:
+
+- First save → new row with `root_id = null` (the root, v1).
+- Subsequent saves → new row with `root_id` pointing to the v1 row.
+- `Prompt::get('welcome')` always resolves to the latest version (`MAX(id)` per `name`).
+
+### Configuration
+
+```php
+// config/prompt.php
+'panel' => [
+    'enabled'    => env('PROMPTS_PANEL_ENABLED', true),
+    'path'       => env('PROMPTS_PANEL_PATH', '_prompts'),
+    'gate'       => 'viewPrompts',
+    'middleware' => ['web'],
+],
+```
+
+Publish the views to customize them:
+
+```bash
+php artisan vendor:publish --tag=prompt-views
+```
+
 ## Security
 
 Blade compiles prompt content. **Do not load prompt content from untrusted sources.** A prompt containing `{{ system('rm -rf /') }}` would execute that PHP if rendered. Treat prompts as code, not user input.
+
+The panel is gated by `Panel::auth()` / Gate and ships behind the `web` middleware group by default — it is **not** safe to expose publicly without authorization.
 
 ## Development
 
@@ -316,6 +382,14 @@ composer test:coverage   # 100% required
 composer test:types      # phpstan
 composer format          # pint
 ```
+
+Boot a local Livewire dev environment (Orchestra Testbench workbench + SQLite):
+
+```bash
+composer dev             # builds the workbench DB and serves at http://127.0.0.1:8000
+```
+
+The workbench wires `Panel::auth()` to always allow, so `/` redirects to `/_prompts` ready to use.
 
 ## Credits
 

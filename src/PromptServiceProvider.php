@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace Baconfy\Prompt;
 
+use Baconfy\Prompt\Livewire\Editor;
+use Baconfy\Prompt\Livewire\Index;
+use Baconfy\Prompt\Livewire\Versions;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
+use Livewire\Livewire;
 
 final class PromptServiceProvider extends ServiceProvider
 {
     /**
      * Registers the service provider by merging the configuration file and binding the PromptManager to the service container.
-     *
-     * @return void
      */
     public function register(): void
     {
@@ -33,11 +35,22 @@ final class PromptServiceProvider extends ServiceProvider
 
             $this->publishesMigrations([__DIR__.'/../database/migrations' => database_path('migrations')], 'prompt-migrations');
 
+            $this->publishes([__DIR__.'/../resources/views' => resource_path('views/vendor/prompt')], 'prompt-views');
+
             $this->commands([
                 Commands\ListPromptsCommand::class,
                 Commands\MakePromptCommand::class,
                 Commands\ShowPromptCommand::class,
             ]);
+        }
+
+        if (config('prompt.panel.enabled') && class_exists(Livewire::class)) {
+            $this->loadViewsFrom(__DIR__.'/../resources/views', 'prompt');
+            $this->loadRoutesFrom(__DIR__.'/../routes/panel.php');
+
+            Livewire::component('prompt::index', Index::class);
+            Livewire::component('prompt::editor', Editor::class);
+            Livewire::component('prompt::versions', Versions::class);
         }
     }
 }

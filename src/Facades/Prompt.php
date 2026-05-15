@@ -6,6 +6,7 @@ namespace Baconfy\Prompt\Facades;
 
 use Baconfy\Prompt\Contracts\Driver;
 use Baconfy\Prompt\FrontMatter\ParsedFrontMatter;
+use Baconfy\Prompt\PromptManager;
 use Baconfy\Prompt\RenderedPrompt;
 use Baconfy\Prompt\Testing\PromptFake;
 use Illuminate\Support\Facades\Facade;
@@ -17,7 +18,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static void assertCalled(string $name)
  * @method static void assertNotCalled(string $name)
  *
- * @see \Baconfy\Prompt\PromptManager
+ * @see PromptManager
  */
 final class Prompt extends Facade
 {

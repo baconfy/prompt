@@ -12,7 +12,8 @@ return new class extends Migration
     {
         Schema::create('prompts', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
+            $table->foreignId('root_id')->nullable()->constrained('prompts')->nullOnDelete();
+            $table->string('name');
             $table->longText('content');
             $table->timestamps();
         });

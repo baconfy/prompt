@@ -12,3 +12,5 @@ composer.lock
 
 *.log
 *.cache
+*.sqlite
+.env

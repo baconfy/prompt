@@ -1,0 +1,26 @@
+providers:
+  - Baconfy\Prompt\PromptServiceProvider
+  - Workbench\App\Providers\WorkbenchServiceProvider
+
+migrations:
+  - database/migrations
+
+env:
+  - APP_NAME="Prompts Dev"
+  - APP_KEY=base64:V0xObVZ4dnNDQU8wWGo4dGxidVI5UlQ4dHo1aldHaTI=
+  - DB_CONNECTION=sqlite
+  - DB_DATABASE=workbench/database/database.sqlite
+
+workbench:
+  start: '/_prompts'
+  install: true
+  discovers:
+    web: true
+    config: true
+  sync: []
+  build:
+    - create-sqlite-db
+    - db-wipe
+    - migrate
+
+php-version: 8.3

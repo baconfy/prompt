@@ -31,7 +31,7 @@ final class MakePromptCommand extends Command
      * Handles the creation of a prompt file in a predefined folder structure based on the given name.
      *
      * @param  Filesystem  $files  The filesystem instance used to check for file existence,
-     *                          ensure directories exist, and write the file.
+     *                             ensure directories exist, and write the file.
      * @return int Returns a status code: self::SUCCESS if the file is successfully created,
      *             or self::FAILURE if an error occurs (e.g., misconfiguration or file already exists).
      */

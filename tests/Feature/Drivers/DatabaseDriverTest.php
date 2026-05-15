@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Baconfy\Prompt\Drivers\DatabaseDriver;
+use Baconfy\Prompt\FrontMatter\Parser;
 use Illuminate\Support\Facades\DB;
 
 beforeEach(function (): void {
@@ -10,7 +11,7 @@ beforeEach(function (): void {
 
     $this->driver = new DatabaseDriver(
         connection: DB::connection(),
-        parser: new \Baconfy\Prompt\FrontMatter\Parser,
+        parser: new Parser,
         table: 'prompts',
     );
 });

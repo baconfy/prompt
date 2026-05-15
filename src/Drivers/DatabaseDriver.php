@@ -17,7 +17,6 @@ final readonly class DatabaseDriver implements Driver
      * @param  Connection  $connection  The database connection instance.
      * @param  Parser  $parser  The parser instance for processing data.
      * @param  string  $table  The name of the database table to be used.
-     *
      * @return void
      */
     public function __construct(private Connection $connection, private Parser $parser, private string $table) {}
@@ -31,7 +30,10 @@ final readonly class DatabaseDriver implements Driver
     public function find(string $name): ?ParsedFrontMatter
     {
         /** @var object{content: string}|null $row */
-        $row = $this->connection->table($this->table)->where('name', $name)->first();
+        $row = $this->connection->table($this->table)
+            ->where('name', $name)
+            ->orderByDesc('id')
+            ->first();
 
         if ($row === null) {
             return null;
@@ -44,6 +46,8 @@ final readonly class DatabaseDriver implements Driver
     {
         /** @var list<string> */
         return $this->connection->table($this->table)
+            ->select('name')
+            ->distinct()
             ->orderBy('name')
             ->pluck('name')
             ->all();

@@ -20,7 +20,7 @@ interface Driver
     public function find(string $name): ?ParsedFrontMatter;
 
     /**
-     * @return list<string>  Available prompt names, sorted alphabetically.
+     * @return list<string> Available prompt names, sorted alphabetically.
      */
     public function all(): array;
 }

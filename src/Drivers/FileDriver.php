@@ -18,7 +18,6 @@ final readonly class FileDriver implements Driver
      * @param  Filesystem  $files  An instance of the Filesystem class used for file operations.
      * @param  Parser  $parser  An instance of the Parser class used for parsing operations.
      * @param  string  $folder  The folder path to be used by the class.
-     *
      * @return void
      */
     public function __construct(private Filesystem $files, private Parser $parser, private string $folder) {}
@@ -28,6 +27,7 @@ final readonly class FileDriver implements Driver
      *
      * @param  string  $name  The name of the file to find and parse.
      * @return ParsedFrontMatter|null Returns the parsed front matter if the file exists, or null if it does not exist.
+     *
      * @throws FileNotFoundException
      */
     public function find(string $name): ?ParsedFrontMatter
@@ -68,7 +68,7 @@ final readonly class FileDriver implements Driver
      * Generates the file system path for the specified file name.
      *
      * @param  string  $name  The name of the file to generate the path for, using dot notation.
-     * @return string  The full path to the file including its extension.
+     * @return string The full path to the file including its extension.
      */
     private function pathFor(string $name): string
     {

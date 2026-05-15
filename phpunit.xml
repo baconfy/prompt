@@ -23,4 +23,8 @@
             <file>src/helpers.php</file>
         </exclude>
     </source>
+    <php>
+        <env name="DB_CONNECTION" value="testing" force="true"/>
+        <env name="DB_DATABASE" value=":memory:" force="true"/>
+    </php>
 </phpunit>

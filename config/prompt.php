@@ -43,4 +43,23 @@ return [
 
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Admin Panel
+    |--------------------------------------------------------------------------
+    |
+    | Optional Livewire-based admin panel for managing prompts stored in the
+    | database driver. Routes are only registered when livewire/livewire is
+    | installed and 'enabled' is true. Access is gated by 'gate' (or the
+    | callback registered via Baconfy\Prompt\Panel::auth()).
+    |
+    */
+
+    'panel' => [
+        'enabled' => env('PROMPTS_PANEL_ENABLED', true),
+        'path' => env('PROMPTS_PANEL_PATH', '_prompts'),
+        'gate' => 'viewPrompts',
+        'middleware' => ['web'],
+    ],
+
 ];

@@ -21,13 +21,14 @@ final class PromptFake
 
     /**
      * @param  array<string, mixed>  $data
+     *
      * @throws PromptNotFoundException
      */
     public function get(string $name, array $data = []): RenderedPrompt
     {
         $this->calls[] = ['name' => $name, 'data' => $data];
 
-        if (!array_key_exists($name, $this->stubs)) {
+        if (! array_key_exists($name, $this->stubs)) {
             throw new PromptNotFoundException($name);
         }
 
@@ -46,7 +47,7 @@ final class PromptFake
     {
         $this->calls[] = ['name' => $name, 'data' => []];
 
-        if (!array_key_exists($name, $this->stubs)) {
+        if (! array_key_exists($name, $this->stubs)) {
             return null;
         }
 
@@ -63,7 +64,6 @@ final class PromptFake
      * Asserts that a specific prompt was called.
      *
      * @param  string  $name  The name of the prompt to check.
-     * @return void
      */
     public function assertCalled(string $name): void
     {
@@ -74,7 +74,6 @@ final class PromptFake
      * Asserts that a prompt with the given name was not called.
      *
      * @param  string  $name  The name of the prompt to verify.
-     * @return void
      */
     public function assertNotCalled(string $name): void
     {
@@ -85,10 +84,10 @@ final class PromptFake
      * Checks if a method with the specified name was called.
      *
      * @param  string  $name  The name of the method to check for.
-     * @return bool  True if the method was called, false otherwise.
+     * @return bool True if the method was called, false otherwise.
      */
     private function wasCalled(string $name): bool
     {
-        return array_any($this->calls, fn($call) => $call['name'] === $name);
+        return array_any($this->calls, fn ($call) => $call['name'] === $name);
     }
 }
