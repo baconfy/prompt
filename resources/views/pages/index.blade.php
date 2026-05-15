@@ -1,12 +1,17 @@
-<div>
-    <div class="mb-6 flex items-center justify-between">
+@extends('prompt::layouts.panel')
+
+@section('content')
+    <div class="mb-6 flex items-center justify-between gap-4">
         <h1 class="text-2xl font-semibold">Prompts</h1>
-        <input
-            type="search"
-            wire:model.live.debounce.300ms="search"
-            placeholder="Search by name…"
-            class="w-72 rounded-md border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-slate-500 focus:ring-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-slate-400 dark:focus:ring-slate-400"
-        >
+        <form method="GET" action="{{ route('prompts.index') }}">
+            <input
+                type="search"
+                name="search"
+                value="{{ $search }}"
+                placeholder="Search by name…"
+                class="w-72 rounded-md border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-slate-500 focus:ring-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-slate-400 dark:focus:ring-slate-400"
+            >
+        </form>
     </div>
 
     @if ($prompts->isEmpty())
@@ -29,7 +34,7 @@
                         <tr>
                             <td class="px-4 py-3 font-medium text-slate-900 dark:text-slate-100">{{ $prompt->name }}</td>
                             <td class="px-4 py-3 text-center">
-                                <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 font-mono font-bold text-xs text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                                <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 font-mono text-xs font-bold text-slate-700 dark:bg-slate-800 dark:text-slate-300">
                                     v{{ $prompt->versions_count }}
                                 </span>
                             </td>
@@ -49,4 +54,4 @@
             {{ $prompts->links() }}
         </div>
     @endif
-</div>
+@endsection

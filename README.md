@@ -304,15 +304,9 @@ use Baconfy\Prompt\Exceptions\MissingRequiredVariablesException;
 
 ## Admin Panel
 
-Optional Livewire-based panel for managing prompts stored in the `database` driver. The `file` driver remains read-only and is meant to be managed via Git.
+Optional admin panel for managing prompts stored in the `database` driver. The `file` driver remains read-only and is meant to be managed via Git.
 
-### Install
-
-```bash
-composer require livewire/livewire:^3
-```
-
-The panel auto-discovers when `livewire/livewire` is installed. Routes are mounted at `/_prompts` by default.
+The panel ships as plain Blade views styled with **Tailwind via CDN** — no front-end build step, no JavaScript framework, no extra dependencies. Routes are mounted at `/_prompts` by default whenever `prompt.panel.enabled` is true.
 
 ### Authorization
 
@@ -383,7 +377,7 @@ composer test:types      # phpstan
 composer format          # pint
 ```
 
-Boot a local Livewire dev environment (Orchestra Testbench workbench + SQLite):
+Boot a local dev environment (Orchestra Testbench workbench + SQLite):
 
 ```bash
 composer dev             # builds the workbench DB and serves at http://127.0.0.1:8000

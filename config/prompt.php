@@ -48,10 +48,11 @@ return [
     | Admin Panel
     |--------------------------------------------------------------------------
     |
-    | Optional Livewire-based admin panel for managing prompts stored in the
-    | database driver. Routes are only registered when livewire/livewire is
-    | installed and 'enabled' is true. Access is gated by 'gate' (or the
-    | callback registered via Baconfy\Prompt\Panel::auth()).
+    | Optional admin panel for managing prompts stored in the database driver.
+    | The panel ships as plain Blade views styled with Tailwind via CDN — no
+    | front-end build step is required. Routes are registered when 'enabled'
+    | is true. Access is gated by 'gate' (or the callback registered via
+    | Baconfy\Prompt\Panel::auth()).
     |
     */
 

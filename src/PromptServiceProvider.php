@@ -4,12 +4,8 @@ declare(strict_types=1);
 
 namespace Baconfy\Prompt;
 
-use Baconfy\Prompt\Livewire\Editor;
-use Baconfy\Prompt\Livewire\Index;
-use Baconfy\Prompt\Livewire\Versions;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
-use Livewire\Livewire;
 
 final class PromptServiceProvider extends ServiceProvider
 {
@@ -44,13 +40,9 @@ final class PromptServiceProvider extends ServiceProvider
             ]);
         }
 
-        if (config('prompt.panel.enabled') && class_exists(Livewire::class)) {
+        if (config('prompt.panel.enabled')) {
             $this->loadViewsFrom(__DIR__.'/../resources/views', 'prompt');
             $this->loadRoutesFrom(__DIR__.'/../routes/panel.php');
-
-            Livewire::component('prompt::index', Index::class);
-            Livewire::component('prompt::editor', Editor::class);
-            Livewire::component('prompt::versions', Versions::class);
         }
     }
 }

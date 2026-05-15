@@ -2,10 +2,8 @@
 
 declare(strict_types=1);
 
-use Baconfy\Prompt\Livewire\Editor;
 use Baconfy\Prompt\Models\Prompt;
 use Baconfy\Prompt\Panel;
-use Livewire\Livewire;
 
 beforeEach(function (): void {
     $this->loadMigrationsFrom(__DIR__.'/../../../database/migrations');
@@ -17,10 +15,10 @@ afterEach(function (): void {
 });
 
 it('creates a new root prompt with null root_id when none exists for the name', function (): void {
-    Livewire::test(Editor::class)
-        ->set('name', 'welcome')
-        ->set('content', 'Hello world')
-        ->call('save');
+    $this->post('/_prompts/save', [
+        'name' => 'welcome',
+        'content' => 'Hello world',
+    ])->assertRedirect('/_prompts');
 
     $row = Prompt::where('name', 'welcome')->first();
     expect($row?->content)->toBe('Hello world')
@@ -30,41 +28,62 @@ it('creates a new root prompt with null root_id when none exists for the name', 
 it('creates a child version pointing to the root when saving over an existing name', function (): void {
     $root = Prompt::create(['name' => 'welcome', 'content' => 'v1']);
 
-    Livewire::test(Editor::class)
-        ->set('name', 'welcome')
-        ->set('content', 'v2 content')
-        ->call('save');
+    $this->post('/_prompts/save', [
+        'name' => 'welcome',
+        'content' => 'v2 content',
+    ])->assertRedirect('/_prompts');
 
     $latest = Prompt::where('name', 'welcome')->orderByDesc('id')->first();
     expect($latest?->content)->toBe('v2 content')
         ->and($latest?->root_id)->toBe($root->id);
 });
 
-it('prefills the form when mounted with an existing prompt', function (): void {
+it('prefills the form when editing an existing prompt', function (): void {
     $prompt = Prompt::create(['name' => 'welcome', 'content' => 'hello']);
 
-    Livewire::test(Editor::class, ['prompt' => $prompt])
-        ->assertSet('name', 'welcome')
-        ->assertSet('content', 'hello')
-        ->assertSet('promptId', $prompt->id);
+    $this->get("/_prompts/{$prompt->id}/edit")
+        ->assertOk()
+        ->assertSee('value="welcome"', escape: false)
+        ->assertSee('hello');
+});
+
+it('renders the empty create form', function (): void {
+    $this->get('/_prompts/create')
+        ->assertOk()
+        ->assertSee('name="name"', escape: false)
+        ->assertSee('name="content"', escape: false);
+});
+
+it('keeps the prompt context on preview when prompt_id is provided', function (): void {
+    $prompt = Prompt::create(['name' => 'welcome', 'content' => 'old']);
+
+    $response = $this->post('/_prompts/preview', [
+        'name' => 'welcome',
+        'content' => 'Hello {{ $name }}!',
+        'variables' => '{"name": "World"}',
+        'prompt_id' => $prompt->id,
+    ])->assertOk();
+
+    expect($response->viewData('prompt')?->id)->toBe($prompt->id);
 });
 
 it('requires both name and content to save', function (): void {
-    Livewire::test(Editor::class)
-        ->set('name', '')
-        ->set('content', '')
-        ->call('save')
-        ->assertHasErrors(['name', 'content']);
+    $this->from('/_prompts/create')
+        ->post('/_prompts/save', ['name' => '', 'content' => ''])
+        ->assertRedirect('/_prompts/create')
+        ->assertSessionHasErrors(['name', 'content']);
 
     expect(Prompt::count())->toBe(0);
 });
 
 it('rejects content with invalid YAML front matter', function (): void {
-    Livewire::test(Editor::class)
-        ->set('name', 'welcome')
-        ->set('content', "---\nname: : bad\n---\nbody")
-        ->call('save')
-        ->assertHasErrors('content');
+    $this->from('/_prompts/create')
+        ->post('/_prompts/save', [
+            'name' => 'welcome',
+            'content' => "---\nname: : bad\n---\nbody",
+        ])
+        ->assertRedirect('/_prompts/create')
+        ->assertSessionHasErrors('content');
 
     expect(Prompt::count())->toBe(0);
 });
@@ -72,29 +91,33 @@ it('rejects content with invalid YAML front matter', function (): void {
 it('refuses to save when content is identical to the current latest version', function (): void {
     Prompt::create(['name' => 'welcome', 'content' => 'same']);
 
-    Livewire::test(Editor::class)
-        ->set('name', 'welcome')
-        ->set('content', 'same')
-        ->call('save')
-        ->assertHasErrors('content');
+    $this->from('/_prompts/create')
+        ->post('/_prompts/save', [
+            'name' => 'welcome',
+            'content' => 'same',
+        ])
+        ->assertRedirect('/_prompts/create')
+        ->assertSessionHasErrors('content');
 
     expect(Prompt::where('name', 'welcome')->count())->toBe(1);
 });
 
 it('renders preview output through Blade with JSON variables', function (): void {
-    Livewire::test(Editor::class)
-        ->set('content', 'Hello {{ $name }}!')
-        ->set('variables', '{"name": "World"}')
-        ->call('preview')
-        ->assertSet('previewOutput', 'Hello World!')
-        ->assertSet('previewError', null);
+    $this->post('/_prompts/preview', [
+        'name' => 'welcome',
+        'content' => 'Hello {{ $name }}!',
+        'variables' => '{"name": "World"}',
+    ])
+        ->assertOk()
+        ->assertSee('Hello World!');
 });
 
 it('captures preview errors when variables JSON is invalid', function (): void {
-    Livewire::test(Editor::class)
-        ->set('content', 'Hello')
-        ->set('variables', 'not-json')
-        ->call('preview')
-        ->assertSet('previewOutput', null)
-        ->assertNotSet('previewError', null);
+    $this->post('/_prompts/preview', [
+        'name' => 'welcome',
+        'content' => 'Hello',
+        'variables' => 'not-json',
+    ])
+        ->assertOk()
+        ->assertSee('Syntax error');
 });

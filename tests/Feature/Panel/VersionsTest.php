@@ -2,10 +2,8 @@
 
 declare(strict_types=1);
 
-use Baconfy\Prompt\Livewire\Versions;
 use Baconfy\Prompt\Models\Prompt;
 use Baconfy\Prompt\Panel;
-use Livewire\Livewire;
 
 beforeEach(function (): void {
     $this->loadMigrationsFrom(__DIR__.'/../../../database/migrations');
@@ -21,19 +19,25 @@ it('lists every version of a prompt with sequential numbering newest first', fun
     Prompt::create(['name' => 'welcome', 'root_id' => $root->id, 'content' => 'v2']);
     Prompt::create(['name' => 'welcome', 'root_id' => $root->id, 'content' => 'v3']);
 
-    $versions = Livewire::test(Versions::class, ['prompt' => $root])
-        ->viewData('versions');
+    $response = $this->get("/_prompts/{$root->id}/versions")->assertOk();
+
+    $versions = $response->viewData('versions');
 
     expect($versions)->toHaveCount(3)
         ->and($versions->pluck('version_number')->all())->toBe([3, 2, 1])
         ->and($versions->pluck('content')->all())->toBe(['v3', 'v2', 'v1']);
+
+    $response->assertSee('v3')
+        ->assertSee('v2')
+        ->assertSee('v1');
 });
 
 it('attaches a diff array against the latest version for each row', function (): void {
     $root = Prompt::create(['name' => 'welcome', 'content' => "a\nb"]);
     Prompt::create(['name' => 'welcome', 'root_id' => $root->id, 'content' => "a\nb\nc"]);
 
-    $versions = Livewire::test(Versions::class, ['prompt' => $root])
+    $versions = $this->get("/_prompts/{$root->id}/versions")
+        ->assertOk()
         ->viewData('versions');
 
     /** @var Prompt $oldest */
@@ -50,8 +54,8 @@ it('restore creates a new version copying the chosen content', function (): void
     $root = Prompt::create(['name' => 'welcome', 'content' => 'v1 content']);
     Prompt::create(['name' => 'welcome', 'root_id' => $root->id, 'content' => 'v2 content']);
 
-    Livewire::test(Versions::class, ['prompt' => $root])
-        ->call('restore', $root->id);
+    $this->post("/_prompts/{$root->id}/versions/{$root->id}/restore")
+        ->assertRedirect("/_prompts/{$root->id}/versions");
 
     $latest = Prompt::where('name', 'welcome')->orderByDesc('id')->first();
     expect($latest?->content)->toBe('v1 content')
@@ -64,8 +68,8 @@ it('delete removes only the targeted row', function (): void {
     $v2 = Prompt::create(['name' => 'welcome', 'root_id' => $root->id, 'content' => 'v2']);
     Prompt::create(['name' => 'welcome', 'root_id' => $root->id, 'content' => 'v3']);
 
-    Livewire::test(Versions::class, ['prompt' => $root])
-        ->call('delete', $v2->id);
+    $this->delete("/_prompts/{$root->id}/versions/{$v2->id}")
+        ->assertRedirect("/_prompts/{$root->id}/versions");
 
     expect(Prompt::where('name', 'welcome')->pluck('content')->all())
         ->toEqualCanonicalizing(['v1', 'v3']);
@@ -75,8 +79,8 @@ it('delete refuses to remove a row that belongs to another prompt name', functio
     $welcome = Prompt::create(['name' => 'welcome', 'content' => 'a']);
     $other = Prompt::create(['name' => 'other', 'content' => 'b']);
 
-    Livewire::test(Versions::class, ['prompt' => $welcome])
-        ->call('delete', $other->id);
+    $this->delete("/_prompts/{$welcome->id}/versions/{$other->id}")
+        ->assertRedirect("/_prompts/{$welcome->id}/versions");
 
     expect(Prompt::where('name', 'other')->count())->toBe(1);
 });

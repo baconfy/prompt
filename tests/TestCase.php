@@ -7,7 +7,6 @@ namespace Baconfy\Prompt\Tests;
 use Baconfy\Prompt\PromptServiceProvider;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
-use Livewire\LivewireServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 abstract class TestCase extends Orchestra
@@ -21,7 +20,6 @@ abstract class TestCase extends Orchestra
     protected function getPackageProviders($app): array
     {
         return [
-            LivewireServiceProvider::class,
             PromptServiceProvider::class,
         ];
     }
