@@ -304,6 +304,10 @@ use Baconfy\Prompt\Exceptions\MissingRequiredVariablesException;
 
 ## Admin Panel
 
+<p align="center">
+    <img src="https://raw.githubusercontent.com/baconfy/prompt/main/docs/prompts.png" width="100%" alt="Prompt">
+</p>
+
 Optional admin panel for managing prompts stored in the `database` driver. The `file` driver remains read-only and is meant to be managed via Git.
 
 The panel ships as plain Blade views styled with **Tailwind via CDN** — no front-end build step, no JavaScript framework, no extra dependencies. Routes are mounted at `/_prompts` by default whenever `prompt.panel.enabled` is true.
